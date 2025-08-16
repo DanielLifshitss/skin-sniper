@@ -1,0 +1,87 @@
+Steam Market Trading Bot
+A microservices-based application for automated trading on the Steam Community Market, designed to analyze market trends, identify profitable opportunities, and execute trades autonomously. This project serves as a comprehensive demonstration of modern software architecture, including microservices, asynchronous communication, and data-driven decision-making.
+
+🚀 Key Features
+Real-time Market Scanning: A dedicated microservice continuously scans the Steam Community Market for price fluctuations.
+
+Data Analysis & Strategy: An isolated service with a custom algorithm analyzes market data to find arbitrage opportunities and profitable trading windows.
+
+Automated Trading: Executes buy and sell orders based on the analysis, without manual intervention.
+
+Modular Architecture: Built with a decoupled microservices design for enhanced scalability, maintainability, and fault isolation.
+
+Containerized Deployment: Uses Docker for consistent and reproducible builds across different environments.
+
+📦 Project Structure
+This project is organized as a monorepo, containing all microservices within a single repository to streamline development and dependency management.
+
+/project_root
+├── /main-app/           # The main API and web application
+│   ├── app/
+│   ├── api/
+│   ├── core/
+│   ├── database/
+│   ├── tests/
+│   ├── .env
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── /market-scanner-bot/ # The bot microservice for scanning and analysis
+│   ├── bot/
+│   ├── core/
+│   ├── tests/
+│   ├── .env
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── .gitignore
+├── README.md
+└── docker-compose.yml   # Defines and links all services
+
+🤖 Technology Stack
+Backend: Python, FastAPI
+
+Asynchronous Tasks: A scheduler within the bot microservice
+
+Database: PostgreSQL
+
+Containerization: Docker, Docker Compose
+
+Communication: RESTful API
+
+Testing: Pytest
+
+🛠️ Getting Started
+Prerequisites
+Docker
+
+Docker Compose
+
+Installation
+Clone the repository:
+
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+Configure Environment Variables:
+Create a .env file in each microservice directory (main-app/ and market-scanner-bot/) based on the .env.example file (you will need to create these example files yourself).
+
+main-app/.env: DATABASE_URL, SECRET_KEY, etc.
+
+market-scanner-bot/.env: STEAM_API_KEY, DATABASE_URL, etc.
+
+Run the application:
+From the project root, start all services using Docker Compose:
+
+docker-compose up --build
+
+This command will build the Docker images and run all services as defined in docker-compose.yml.
+
+Usage
+Once the services are running, you can access the main application's API at http://localhost:8001 (or your configured port). The bot will begin scanning the market and populating the database as a background process.
+
+🤝 Contribution
+This project is open for collaboration. Feel free to open an issue or submit a pull request with any improvements or new features.
+
+📄 License
+This project is licensed under the MIT License.
