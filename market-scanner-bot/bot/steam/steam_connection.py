@@ -1,6 +1,5 @@
 from steampy.client import SteamClient
 
-
 def steam_client_session_decorator(api_key, username, password, steamguard_path):
     """
     A decorator to manage a synchronous SteamClient session.
