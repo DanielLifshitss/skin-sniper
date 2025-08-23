@@ -1,22 +1,28 @@
 from bs4 import BeautifulSoup
-import steammarket as sm
 import requests
 import time
 
+
 class SteamWebScraper:
+    def __init__(self, item_name:str, appid:int, currency:str = None):
+        self.item_name = item_name
+        self.currency = currency
+        self.appid = appid
+    
     BASE_URL = "https://steamcommunity.com/market/search/render/"
     
-    @staticmethod
-    def get_item_via_steam_url(item_type_name: str, appid: int) -> list:
+    def get_item_via_steam_url(self) -> list:
         item_names = []
         start = 0
+        
         while True:
             params = {
-                'query': item_type_name,
-                'appid': appid,
+                'query': self.item_name,
+                'appid': self.appid,
                 'start': start,
                 'count': 100
             }
+            
             response = requests.get(SteamWebScraper.BASE_URL, params=params)
             data = response.json()
             
