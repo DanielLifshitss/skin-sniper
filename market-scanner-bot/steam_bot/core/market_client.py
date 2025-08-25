@@ -1,4 +1,3 @@
-from ..bot import API_KEY, STEAM_USERNAME, STEAM_PASSWORD, PATH_TO_STEAMGUARD_FILE
 import steammarket as sm
 from steampy.client import SteamClient
 from dataclasses import dataclass, field
@@ -19,26 +18,17 @@ def steam_client_session_decorator(api_key, username, password, steamguard_path)
         return wrapped_func
     return wrapper
 
-
     
 class SteamClient:
-    def __init__(self, item_asset_id:int = None,item_name:str = None,currency:str = None,appid:int = None,item_buy_price:int = None,marketable:bool = None,item_sell_price:int = None):
+    def __init__(self, client):
+        self.client = client
         
-        self.item_asset_id = item_asset_id
-        self.item_name = item_name
-        self.currency = currency
-        self.appid = appid
-        self.item_buy_price = item_buy_price
-        self.marketable = marketable
-        self.item_sell_price = item_sell_price
-
-
+        
     """
     Function using steampy library:
     -------------------------------
     """
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def buy_skin_in_market(self, client) -> dict:
+    def buy_skin_in_market(self, item_name: str, item_buy_price: int) -> dict:
         """
         Places a buy order for a skin on the Steam Community Market at the lowest available price.
 
@@ -50,15 +40,14 @@ class SteamClient:
             Example: {"response": {"item_name_bought": "Glock-18 | High Beam (Minimal Wear)","order_id": "1234567890"}}
         """
         try:
-            buy_order_id = client.market.buy_item_with_lowest_price(self.item_name, self.item_buy_price)
-            return {"response" : {"item_name_bought" : self.item_name, "order_id" : buy_order_id}}
+            buy_order_id = self.client.market.buy_item_with_lowest_price(item_name, item_buy_price)
+            return {"response" : {"item_name_bought" : item_name, "order_id" : buy_order_id}}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
     
         
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def sell_skin_on_market(self, client) -> dict:
+    def sell_skin_on_market(self, item_asset_id:int, appid:int, item_sell_price:int, item_name:str) -> dict:
         """
         Sells an item\skin from bot inventory with the asset_id.
 
@@ -70,15 +59,14 @@ class SteamClient:
             Example: {"response": {"item_name_sell": "Glock-18 | High Beam (Minimal Wear)","sell_orderid": "1234567890"}}
         """
         try:
-            skin_to_sell = client.market.create_sell_order(self.item_asset_id, self.appid, self.item_sell_price)
-            return  {"response" : {"item_name_sell" : self.item_name, "sell_orderid" : skin_to_sell['sell_orderid']}}
+            skin_to_sell = self.client.market.create_sell_order(item_asset_id, appid, item_sell_price)
+            return  {"response" : {"item_name_sell" : item_name, "sell_orderid" : skin_to_sell['sell_orderid']}}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
     
     
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def get_bot_item_inventory(self, client) -> dict:
+    def get_bot_item_inventory(self, appid:int, item_name:str) -> dict:
         """
         Retrieves all items from the bot's Steam inventory for a specified game.
 
@@ -110,7 +98,7 @@ class SteamClient:
             }
         """
         try:
-            bot_inventory_data = client.get_my_inventory(self.appid)
+            bot_inventory_data = self.client.get_my_inventory(appid)
             
             items_in_bot_inventory = [
                 {
@@ -127,12 +115,11 @@ class SteamClient:
             
             return {'response' : items_in_bot_inventory}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
 
 
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def get_bot_listings_items_on_market(self, client) -> dict:
+    def get_bot_listings_items_on_market(self, item_name:str) -> dict:
         """
         Retrieves the items that are listed by the bot on the steam market.
 
@@ -157,7 +144,7 @@ class SteamClient:
                 }
         """
         try:
-            listings  = client.market.get_my_market_listings()
+            listings  = self.client.market.get_my_market_listings()
             
             sell_listings_data = [
                 {
@@ -170,12 +157,11 @@ class SteamClient:
             
             return {"response" : sell_listings_data}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
     
     
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def get_bot_wallet_balance(self, client) -> dict:
+    def get_bot_wallet_balance(self, item_name:str) -> dict:
         """    
         Retrieves the Steam wallet balance and any funds on hold for the authenticated account.
 
@@ -188,18 +174,17 @@ class SteamClient:
             The balance is in return from the function in Centes -> converting it to dollares and return it in response in dollars.
         """
         try:
-            wallet_balance = client.get_wallet_balance()
-            on_hold_wallet_balance = client.get_wallet_balance(on_hold = True)
+            wallet_balance = self.client.get_wallet_balance()
+            on_hold_wallet_balance = self.client.get_wallet_balance(on_hold = True)
             if wallet_balance or on_hold_wallet_balance:
                 response = {"wallet_balance" : wallet_balance / 100.0, "on_hold_wallet_balance": on_hold_wallet_balance / 100.0}
                 return {"response" : response}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
 
 
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def get_item_market_price_history(self, client) -> dict:
+    def get_item_market_price_history(self, item_name:str, appid:int) -> dict:
         """
         Retrieves the price history of item\skin. 
 
@@ -221,20 +206,19 @@ class SteamClient:
             }
         """
         try:
-            query_resp = client.market.fetch_price_history(self.item_name, game=self.appid)
+            query_resp = self.client.market.fetch_price_history(item_name, game=appid)
             if query_resp.get("success"):
                 response = {
-                    "item_name": self.item_name,
+                    "item_name": item_name,
                     "item_prices_history" : query_resp.get("prices")
                 }
                 return response
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
     
     
-    @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
-    def get_item_market_information(self, client) -> dict:
+    def get_item_market_information(self, item_name:str, appid:int, currency:int) -> dict:
         """
         Retrieves information about an item\skin. 
 
@@ -255,19 +239,19 @@ class SteamClient:
             }
         """
         try:
-            data = client.get_item(item=self.item_name, appid=self.appid, currency=self.currency)
+            data = self.client.get_item(item=item_name, appid=appid, currency=currency)
             if data.get("success"):
                 item_data =  {
-                    "item_name": self.item_name,
-                    "appid": self.appid,
+                    "item_name": item_name,
+                    "appid": appid,
                     "volume": data.get("volume"),
                     "lowest_price": data.get("lowest_price"),
                     "median_price": data.get("median_price"),
                 }
                 return {"response" : item_data}
-            return {"error": f"Could not get data for {self.item_name}"}
+            return {"error": f"Could not get data for {item_name}"}
         except Exception as e:
-            print(f"SteamMarket error for {self.item_name}: {e}")
+            print(f"SteamMarket error for {item_name}: {e}")
             return {"error": str(e)}
     
     
@@ -275,14 +259,14 @@ class SteamClient:
     Function Using steammarket library:
     -----------------------------------
     """
-    def get_csgo_item_data(self) -> dict:
+    def get_csgo_item_data(self , item_name:str, currency:int) -> dict:
         try:
-            item_data = sm.get_csgo_item(item=self.item_name, currency=self.currency)
+            item_data = sm.get_csgo_item(item=item_name, currency=currency)
                     
             if item_data.get('success'):
             
                 response = {
-                    'item_name': self.item_name,
+                    'item_name': item_name,
                     'item_volume': item_data.get('volume'),
                     'item_lowest_price': item_data.get('lowest_price'),
                     'item_medium_price':item_data.get('median_price')
@@ -290,9 +274,9 @@ class SteamClient:
                 
                 return  response
             else:
-                return {'error_message': f'Could not get data for {self.item_name}', 'item_name': self.item_name}
+                return {'error_message': f'Could not get data for {item_name}', 'item_name': item_name}
         
         except Exception as e:
-            print(f"An error occurred while fetching data for {self.item_name}: {e}")
+            print(f"An error occurred while fetching data for {item_name}: {e}")
            
            
