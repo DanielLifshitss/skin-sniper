@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+from ..core import market_client as ms
 
 #Loading Steam Cradentials:
 load_dotenv()

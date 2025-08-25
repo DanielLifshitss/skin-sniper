@@ -1,7 +1,5 @@
-import steammarket as sm
 from steampy.client import SteamClient
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
 
 #TODO: Need to fix and adjust the Exceptions in all the functions.
 
@@ -255,28 +253,4 @@ class SteamClient:
             return {"error": str(e)}
     
     
-    """
-    Function Using steammarket library:
-    -----------------------------------
-    """
-    def get_csgo_item_data(self , item_name:str, currency:int) -> dict:
-        try:
-            item_data = sm.get_csgo_item(item=item_name, currency=currency)
-                    
-            if item_data.get('success'):
-            
-                response = {
-                    'item_name': item_name,
-                    'item_volume': item_data.get('volume'),
-                    'item_lowest_price': item_data.get('lowest_price'),
-                    'item_medium_price':item_data.get('median_price')
-                }
-                
-                return  response
-            else:
-                return {'error_message': f'Could not get data for {item_name}', 'item_name': item_name}
-        
-        except Exception as e:
-            print(f"An error occurred while fetching data for {item_name}: {e}")
-           
            
