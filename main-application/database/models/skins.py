@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean,ForeignKey, Date
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Date
 from database import Base
 from sqlalchemy.dialects.postgresql import JSONB
 
 
-class Item(Base):
+class Item(Base):  
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
