@@ -13,9 +13,14 @@ def steam_client_session_decorator(api_key, username, password, steamguard_path)
     """
     def wrapper(func):
         def wrapped_func(*args, **kwargs):
-            with SteamClient(api_key) as client:
-                client.login(username, password, steamguard_path)
-                return func(client, *args, **kwargs)
+            try:
+                with SteamClient(api_key) as client:
+                    client.login(username, password, steamguard_path)
+                    logger.info("Succesfully created session to Steam Client")
+                    return func(client, *args, **kwargs)
+            except Exception as e:
+                logger.critical(f"An error occurred during a Steam Client session: {e}")
+                raise
         return wrapped_func
     return wrapper
 

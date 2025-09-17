@@ -2,6 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session
 from database import engine
+import logging
+
+logger = logging.getLogger(__name__)
 
 def session_to_database(func):
     """
@@ -17,10 +20,17 @@ def session_to_database(func):
                 return func(*args, **kwargs)
 
         session = create_session()
-        result = func(session, *args, **kwargs)
-        close_session(session)
-        return result
-
+        
+        try:
+            result = func(session, *args, **kwargs)
+            logger.info("Succesfully created session to database")
+            return result
+        except Exception as e:
+            logger.critical(f"An error occurred during a database operation: {e}")
+            raise
+        finally:
+            close_session(session)
+            
     return wrapper
 
 

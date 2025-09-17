@@ -5,6 +5,7 @@ from steampy.client import SteamClient
 from ..bot import API_KEY, STEAM_USERNAME, STEAM_PASSWORD, PATH_TO_STEAMGUARD_FILE
 import logging
 
+logger = logging.getLogger(__name__)
 
 @steam_client_session_decorator(api_key=API_KEY, username=STEAM_USERNAME, password=STEAM_PASSWORD, steamguard_path=PATH_TO_STEAMGUARD_FILE)
 def get_item_data(item_name, currency) -> dict:
