@@ -34,7 +34,7 @@ class SteamClient:
     Function using steampy library:
     -------------------------------
     """
-    def buy_skin_in_market(self, item_name: str, item_buy_price: int) -> dict:
+    def buy_skin_in_market(self, item_name: str, item_buy_price: int, currency:str ) -> dict:
         """
         Places a buy order for a skin on the Steam Community Market at the lowest available price.
 
@@ -46,9 +46,9 @@ class SteamClient:
             Example: {"response": {"item_name_bought": "Glock-18 | High Beam (Minimal Wear)","order_id": "1234567890"}}
         """
         try:
-            logging.info(f"Bot is about to buy the item: {item_name}, for {item_buy_price}")
+            logging.info(f"Bot is about to buy the item: {item_name}, for {item_buy_price} {currency}")
             buy_order_id = self.client.market.buy_item_with_lowest_price(item_name, item_buy_price)
-            logging.info(f"Bot successfuly bought the item: {item_name}, for {item_buy_price}")
+            logging.info(f"Bot successfuly bought the item: {item_name}, for {item_buy_price} {currency}")
             return {"response" : {"item_name_bought" : item_name, "order_id" : buy_order_id}}
         except Exception as e:
             logging.error(f"Bot could not buy item:{item_name}, system error: {str(e)}")
@@ -76,7 +76,7 @@ class SteamClient:
             return {"error": str(e)}
     
     
-    def get_bot_item_inventory(self, appid:int, item_name:str) -> dict:
+    def get_bot_item_inventory(self, appid:int) -> dict:
         """
         Retrieves all items from the bot's Steam inventory for a specified game.
 
@@ -171,7 +171,7 @@ class SteamClient:
             return {"error": str(e)}
     
     
-    def get_bot_wallet_balance(self, item_name:str) -> dict:
+    def get_bot_wallet_balance(self) -> dict:
         """    
         Retrieves the Steam wallet balance and any funds on hold for the authenticated account.
 
@@ -230,7 +230,7 @@ class SteamClient:
             return {"error": str(e)}
     
     
-    def get_item_market_information(self, item_name:str, appid:int, currency:int) -> dict:
+    def get_item_market_information(self, item_name:str, appid:int, currency:str) -> dict:
         """
         Retrieves information about an item\skin. 
 
