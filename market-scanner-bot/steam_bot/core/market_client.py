@@ -1,5 +1,8 @@
 from steampy.client import SteamClient
 from dataclasses import dataclass, field
+import logging
+
+logger = logging.getLogger(__name__)
 
 #TODO: Need to fix and adjust the Exceptions in all the functions.
 
@@ -38,10 +41,12 @@ class SteamClient:
             Example: {"response": {"item_name_bought": "Glock-18 | High Beam (Minimal Wear)","order_id": "1234567890"}}
         """
         try:
+            logging.info(f"Bot is about to buy the item: {item_name}, for {item_buy_price}")
             buy_order_id = self.client.market.buy_item_with_lowest_price(item_name, item_buy_price)
+            logging.info(f"Bot successfuly bought the item: {item_name}, for {item_buy_price}")
             return {"response" : {"item_name_bought" : item_name, "order_id" : buy_order_id}}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error(f"Bot could not buy item:{item_name}, system error: {str(e)}")
             return {"error": str(e)}
     
         
@@ -57,10 +62,12 @@ class SteamClient:
             Example: {"response": {"item_name_sell": "Glock-18 | High Beam (Minimal Wear)","sell_orderid": "1234567890"}}
         """
         try:
+            logging.info(f"Bot is about to sell the item: {item_name}, for {item_sell_price}")
             skin_to_sell = self.client.market.create_sell_order(item_asset_id, appid, item_sell_price)
+            logging.info(f"Bot successfuly sold the item: {item_name}, for {item_sell_price}")
             return  {"response" : {"item_name_sell" : item_name, "sell_orderid" : skin_to_sell['sell_orderid']}}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error(f"Bot could not sell item:{item_name}, system error: {str(e)}")
             return {"error": str(e)}
     
     
@@ -110,14 +117,14 @@ class SteamClient:
                     
                 } for item_asset_id, item_details  in bot_inventory_data.items()
             ]
-            
+            logging.info("Bot got the items informations from inventory successfuly")
             return {'response' : items_in_bot_inventory}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error("Bot could get items information from inventory")
             return {"error": str(e)}
 
 
-    def get_bot_listings_items_on_market(self, item_name:str) -> dict:
+    def get_bot_listings_items_on_market(self) -> dict:
         """
         Retrieves the items that are listed by the bot on the steam market.
 
@@ -152,10 +159,10 @@ class SteamClient:
                 }
             for listing_id, details in listings['sell_listings'].items()
             ]
-            
+            logging.info('Bot got items listed on the market')
             return {"response" : sell_listings_data}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error('Bot could not get items listed on the market')
             return {"error": str(e)}
     
     
@@ -176,9 +183,10 @@ class SteamClient:
             on_hold_wallet_balance = self.client.get_wallet_balance(on_hold = True)
             if wallet_balance or on_hold_wallet_balance:
                 response = {"wallet_balance" : wallet_balance / 100.0, "on_hold_wallet_balance": on_hold_wallet_balance / 100.0}
+                logging.info("Bot got acount wallet\\on hold wallet balance")
                 return {"response" : response}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error("Bot could not get wallet\\on hold wallet balance")
             return {"error": str(e)}
 
 
@@ -210,9 +218,10 @@ class SteamClient:
                     "item_name": item_name,
                     "item_prices_history" : query_resp.get("prices")
                 }
+                logging.info("Bot got single item market prices history")
                 return response
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error("Bot could not get a single item market prices history")
             return {"error": str(e)}
     
     
@@ -246,10 +255,10 @@ class SteamClient:
                     "lowest_price": data.get("lowest_price"),
                     "median_price": data.get("median_price"),
                 }
+                logging.info("Bot got single item market information")
                 return {"response" : item_data}
-            return {"error": f"Could not get data for {item_name}"}
         except Exception as e:
-            print(f"SteamMarket error for {item_name}: {e}")
+            logging.error("Bot could not get single item market information price")
             return {"error": str(e)}
     
     
